@@ -6,7 +6,7 @@ from termcolor import colored
 
 def red(str: str) -> str:
     """Returns a given string in RED color, using the colored module from termcolor"""
-    return colored(str, "red")
+    return colored(str, "red").strip()
 
 def white(str: str) -> str:
     """Returns a given string in WHITE color, using the colored module from termcolor"""
@@ -63,18 +63,51 @@ while True:
 ║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("████")}{red("██")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
 ║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}    {gray("< Page 1/4 >")}   ║
 ╚══════════════════════════════════════════════╝""", end="")
+    elif screen == 1:
+        print("""
 ╔══════════════════════════════════════════════╗
 ║                                              ║
 ║                                              ║
-║                                              ║
-║                  Size ok!                    ║
-║                                              ║
+║    Uh oh, looks like this is not ready       ║
+║         yet! Please come back later          ║
+║                 (Page 2)                     ║
 ║                                              ║
 ║                                              ║
 ║                                              ║
 ╚══════════════════════════════════════════════╝""", end="")
-
-input()
+    elif screen == 2:
+        print("""
+╔══════════════════════════════════════════════╗
+║                                              ║
+║                                              ║
+║    Uh oh, looks like this is not ready       ║
+║         yet! Please come back later          ║
+║                 (Page 3)                     ║
+║                                              ║
+║                                              ║
+║                                              ║
+╚══════════════════════════════════════════════╝""", end="")
+    elif screen == 3:
+        print("""
+╔══════════════════════════════════════════════╗
+║                                              ║
+║                                              ║
+║    Uh oh, looks like this is not ready       ║
+║         yet! Please come back later          ║
+║                 (Page 4)                     ║
+║                                              ║
+║                                              ║
+║                                              ║
+╚══════════════════════════════════════════════╝""", end="")
+    k = readkey()
+    if k == key.LEFT:
+        screen -= 1
+        if screen < 0:
+            screen = 3
+    elif k == key.RIGHT:
+        screen += 1
+        if screen > 3:
+            screen = 0
 
 # Cool box divider: ╔════════╗
 #                   ║        ║ Source: https://gist.github.com/jamiew/40c66061b666272462c17f65addb14d5
