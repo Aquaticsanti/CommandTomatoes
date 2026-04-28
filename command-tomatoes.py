@@ -2,6 +2,23 @@ from readchar import readkey, key
 import shutil
 import win32gui, win32con
 import time
+from termcolor import colored
+
+def red(str: str) -> str:
+    """Returns a given string in RED color, using the colored module from termcolor"""
+    return colored(str, "red")
+
+def white(str: str) -> str:
+    """Returns a given string in WHITE color, using the colored module from termcolor"""
+    return colored(str, "white")
+
+def blue(str: str) -> str:
+    """Returns a given string in BLUE color, using the colored module from termcolor"""
+    return colored(str, "blue")
+
+def light_blue(str: str) -> str:
+    """Returns a given string in LIGHT BLUE color, using the colored module from termcolor"""
+    return colored(str, "light_blue")
 
 hwnd = win32gui.GetForegroundWindow()
 win32gui.SetWindowPos(hwnd,win32con.HWND_TOPMOST,100,100,200,260,0)
