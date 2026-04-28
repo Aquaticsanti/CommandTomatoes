@@ -20,6 +20,10 @@ def light_blue(str: str) -> str:
     """Returns a given string in LIGHT BLUE color, using the colored module from termcolor"""
     return colored(str, "light_blue")
 
+def gray(str: str) -> str:
+    """Returns a given string in DARK GRAY color, using the colored module from termcolor"""
+    return colored(str, "dark_grey")
+
 hwnd = win32gui.GetForegroundWindow()
 win32gui.SetWindowPos(hwnd,win32con.HWND_TOPMOST,100,100,200,260,0)
 time.sleep(0.5)
