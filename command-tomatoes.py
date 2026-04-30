@@ -64,16 +64,16 @@ while True:
 ║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}    {gray("< Page 1/4 >")}   ║
 ╚══════════════════════════════════════════════╝""", end="")
     elif screen == 1:
-        print("""
+        print(f"""
 ╔══════════════════════════════════════════════╗
-║                                              ║
-║                                              ║
-║    Uh oh, looks like this is not ready       ║
-║         yet! Please come back later          ║
-║                 (Page 2)                     ║
-║                                              ║
-║                                              ║
-║                                              ║
+║{light_blue("█")}{white("█████")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("███")}{light_blue("██")}{white("███")}{light_blue("██")}{white("████")}                   ║
+║{light_blue("█")}{white("█")}{light_blue("█████")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}                   ║
+║{light_blue("█")}{white("█████")}{light_blue("█")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("███")}{light_blue("███")}{white("██")}{light_blue("█")}    SHORT BREAK    ║
+║{light_blue("█████")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}       MM:SS       ║
+║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█████")}{light_blue("██")}{white("██")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")} {gray("(not started yet)")} ║
+║{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█████")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
+║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("███")}{light_blue("███")}{white("████")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
+║{light_blue("█")}{white("████")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█████")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█")}{white("██")}    {gray("< Page 2/4 >")}   ║
 ╚══════════════════════════════════════════════╝""", end="")
     elif screen == 2:
         print("""
