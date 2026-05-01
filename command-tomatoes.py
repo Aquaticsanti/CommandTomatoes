@@ -2,6 +2,7 @@ from readchar import readkey, key
 import shutil
 import win32gui, win32con
 import time
+import datetime
 from termcolor import colored
 
 def red(str: str) -> str:
@@ -40,7 +41,6 @@ soundOnDone = True
 
 #print(f"columns: {cols} - rows: {rows}")
 while cols != 48 and rows != 10:
-    cols, rows = shutil.get_terminal_size()
     print("""
 ╔══════════════════════════════════════════════╗
 ║                                              ║
@@ -52,12 +52,16 @@ while cols != 48 and rows != 10:
 ║                                              ║
 ║                                              ║
 ╚══════════════════════════════════════════════╝""", end="")
+    while cols != 48 and rows != 10:
+        cols, rows = shutil.get_terminal_size()
 print("")
 # Screen zero: Pomodoro timer (default 25 mins)
 # Screen one: Short break (default 5 mins)
 # Screen two: Long break (default 15 mins)
 # Screen three: Settings
 screen = 0
+started = None
+paused = None
 
 while True:
     if screen == 0:
@@ -67,7 +71,7 @@ while True:
 ║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("██")}{red("█")}{white("██")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
 ║{red("█")}{white("████")}{red("██")}{white("█")}{red("████")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}    FOCUS BLOCK    ║
 ║{red("█")}{white("█")}{red("██████")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}       {f"{focusLength.minute}:{focusLength.second if len(str(focusLength.second)) == 2 else f"0{focusLength.second}"}"}       ║
-║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("████")}{red("███")}{white("████")}{red("█")}{red("█")} {gray("(not started yet)")} ║
+║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("████")}{red("███")}{white("████")}{red("█")}{red("█")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
 ║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
 ║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("████")}{red("██")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
 ║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}    {gray("< Page 1/4 >")}   ║
@@ -79,7 +83,7 @@ while True:
 ║{light_blue("█")}{white("█")}{light_blue("█████")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}                   ║
 ║{light_blue("█")}{white("█████")}{light_blue("█")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("███")}{light_blue("███")}{white("██")}{light_blue("█")}    SHORT BREAK    ║
 ║{light_blue("█████")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}       {f"{shortBreakLenght.minute}:{shortBreakLenght.second if len(str(shortBreakLenght.second)) == 2 else f"0{shortBreakLenght.second}"}"}        ║
-║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█████")}{light_blue("██")}{white("██")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")} {gray("(not started yet)")} ║
+║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█████")}{light_blue("██")}{white("██")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
 ║{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█████")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
 ║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("███")}{light_blue("███")}{white("████")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
 ║{light_blue("█")}{white("████")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█████")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█")}{white("██")}    {gray("< Page 2/4 >")}   ║
@@ -91,7 +95,7 @@ while True:
 ║{blue("█")}{white("█")}{blue("██████")}{white("█")}{blue("███")}{white("█")}{blue("██")}{white("██")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█████")}                   ║
 ║{blue("█")}{white("█")}{blue("██████")}{white("█")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("██")}{blue("██")}{white("█")}{blue("██")}{white("███")}     LONG BREAK    ║
 ║{blue("█")}{white("█████")}{blue("███")}{white("███")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("███")}{white("███")}{blue("██")}       {f"{longBreakLenght.minute}:{longBreakLenght.second if len(str(longBreakLenght.second)) == 2 else f"0{longBreakLenght.second}"}"}       ║
-║{blue("█")}{white("████")}{blue("██")}{white("███")}{blue("██")}{white("█████")}{blue("██")}{white("██")}{blue("██")}{white("█")}{blue("█")}{white("██")} {gray("(not started yet)")} ║
+║{blue("█")}{white("████")}{blue("██")}{white("███")}{blue("██")}{white("█████")}{blue("██")}{white("██")}{blue("██")}{white("█")}{blue("█")}{white("██")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
 ║{blue("█")}{white("█")}{blue("███")}{white("█")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█")}{blue("█████")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("██")}{blue("██")}                   ║
 ║{blue("█")}{white("████")}{blue("██")}{white("███")}{blue("██")}{white("███")}{blue("███")}{white("████")}{blue("█")}{white("██")}{blue("██")}                   ║
 ║{blue("█")}{white("████")}{blue("██")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█████")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█")}{blue("█")}{white("██")}    {gray("< Page 3/4 >")}   ║
@@ -110,13 +114,24 @@ while True:
 ╚══════════════════════════════════════════════╝""", end="")
     k = readkey()
     if k == key.LEFT:
-        screen -= 1
-        if screen < 0:
-            screen = 3
+        if paused == True or started == None:
+            screen -= 1
+            if screen < 0:
+                screen = 3
     elif k == key.RIGHT:
-        screen += 1
-        if screen > 3:
-            screen = 0
+        if paused == True or started == None:
+            screen += 1
+            if screen > 3:
+                screen = 0
+    elif k == key.SPACE:
+        if started == True:
+            if paused == True:
+                paused = False
+            else:
+                paused = True
+        else:
+            started = True
+            paused = False
 
 # Cool box divider: ╔════════╗
 #                   ║        ║ Source: https://gist.github.com/jamiew/40c66061b666272462c17f65addb14d5
