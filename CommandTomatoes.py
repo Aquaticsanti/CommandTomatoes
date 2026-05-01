@@ -5,6 +5,19 @@ import time
 import datetime
 import threading
 from termcolor import colored
+import argparse
+
+parser = argparse.ArgumentParser(
+                    prog='CommandTomatoes',
+                    description='A Pomodoro Timer for your Command Line! (To start without options, use no arguments.)')
+parser.add_argument("-f", "--focus-time", default=25, type=float,
+                    help="Set the time for the focus block, formated as a float of 'minutes.seconds'.Defaults to 25 mins.")
+parser.add_argument("-s", "--short-break-time", default=5, type=float,
+                    help="Set the time for the short break block, formated as a float of 'minutes.seconds' Defaults to 5 mins.")
+parser.add_argument("-l", "--long-break-time", default=15, type=float,
+                    help="Set the time for the long break block, formated as a float of 'minutes.seconds' Defaults to 15 mins.")
+
+args = vars(parser.parse_args())
 
 def red(str: str) -> str:
     """Returns a given string in RED color, using the colored module from termcolor"""
@@ -35,9 +48,9 @@ win32gui.SetWindowPos(hwnd,win32con.HWND_TOPMOST,100,100,200,260,0)
 time.sleep(0.5)
 cols, rows = shutil.get_terminal_size()
 
-focusLength = datetime.timedelta(minutes=25, seconds=0)
-shortBreakLenght = datetime.timedelta(minutes=5, seconds=0)
-longBreakLenght = datetime.timedelta(minutes=15, seconds=0)
+focusLength = datetime.timedelta(minutes=int(args["focus_time"]), seconds=int(str(float(args["focus_time"])-int(args["focus_time"]))[2:]))
+shortBreakLenght = datetime.timedelta(minutes=int(args["short_break_time"]), seconds=int(str(float(args["short_break_time"])-int(args["short_break_time"]))[2:]))
+longBreakLenght = datetime.timedelta(minutes=int(args["long_break_time"]), seconds=int(str(float(args["long_break_time"])-int(args["long_break_time"]))[2:]))
 elapsedSec = 0
 
 #print(f"columns: {cols} - rows: {rows}")
