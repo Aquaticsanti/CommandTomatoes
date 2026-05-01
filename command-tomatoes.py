@@ -3,6 +3,7 @@ import shutil
 import win32gui, win32con
 import time
 import datetime
+import threading
 from termcolor import colored
 
 def red(str: str) -> str:
@@ -34,10 +35,11 @@ win32gui.SetWindowPos(hwnd,win32con.HWND_TOPMOST,100,100,200,260,0)
 time.sleep(0.5)
 cols, rows = shutil.get_terminal_size()
 
-focusLength = datetime.time(0,25,00)
-shortBreakLenght = datetime.time(0,5,00)
-longBreakLenght = datetime.time(0,15,00)
+focusLength = datetime.timedelta(minutes=25, seconds=0)
+shortBreakLenght = datetime.timedelta(minutes=5, seconds=0)
+longBreakLenght = datetime.timedelta(minutes=15, seconds=0)
 soundOnDone = True
+elapsedSec = 0
 
 #print(f"columns: {cols} - rows: {rows}")
 while cols != 48 and rows != 10:
@@ -63,63 +65,18 @@ screen = 0
 started = None
 paused = None
 
-while True:
-    if screen == 0:
-        print(f"""
-╔══════════════════════════════════════════════╗
-║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}                   ║
-║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("██")}{red("█")}{white("██")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
-║{red("█")}{white("████")}{red("██")}{white("█")}{red("████")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}    FOCUS BLOCK    ║
-║{red("█")}{white("█")}{red("██████")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}       {f"{focusLength.minute}:{focusLength.second if len(str(focusLength.second)) == 2 else f"0{focusLength.second}"}"}       ║
-║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("████")}{red("███")}{white("████")}{red("█")}{red("█")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
-║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
-║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("████")}{red("██")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
-║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}    {gray("< Page 1/4 >")}   ║
-╚══════════════════════════════════════════════╝""", end="")
-    elif screen == 1:
-        print(f"""
-╔══════════════════════════════════════════════╗
-║{light_blue("█")}{white("█████")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("███")}{light_blue("██")}{white("███")}{light_blue("██")}{white("████")}                   ║
-║{light_blue("█")}{white("█")}{light_blue("█████")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}                   ║
-║{light_blue("█")}{white("█████")}{light_blue("█")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("███")}{light_blue("███")}{white("██")}{light_blue("█")}    SHORT BREAK    ║
-║{light_blue("█████")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}       {f"{shortBreakLenght.minute}:{shortBreakLenght.second if len(str(shortBreakLenght.second)) == 2 else f"0{shortBreakLenght.second}"}"}        ║
-║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█████")}{light_blue("██")}{white("██")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
-║{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█████")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
-║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("███")}{light_blue("███")}{white("████")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
-║{light_blue("█")}{white("████")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█████")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█")}{white("██")}    {gray("< Page 2/4 >")}   ║
-╚══════════════════════════════════════════════╝""", end="")
-    elif screen == 2:
-        print(F"""
-╔══════════════════════════════════════════════╗
-║{blue("█")}{white("█")}{blue("███████")}{white("███")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("███")}{white("███")}{blue("██")}                   ║
-║{blue("█")}{white("█")}{blue("██████")}{white("█")}{blue("███")}{white("█")}{blue("██")}{white("██")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█████")}                   ║
-║{blue("█")}{white("█")}{blue("██████")}{white("█")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("██")}{blue("██")}{white("█")}{blue("██")}{white("███")}     LONG BREAK    ║
-║{blue("█")}{white("█████")}{blue("███")}{white("███")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("███")}{white("███")}{blue("██")}       {f"{longBreakLenght.minute}:{longBreakLenght.second if len(str(longBreakLenght.second)) == 2 else f"0{longBreakLenght.second}"}"}       ║
-║{blue("█")}{white("████")}{blue("██")}{white("███")}{blue("██")}{white("█████")}{blue("██")}{white("██")}{blue("██")}{white("█")}{blue("█")}{white("██")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
-║{blue("█")}{white("█")}{blue("███")}{white("█")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█")}{blue("█████")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("██")}{blue("██")}                   ║
-║{blue("█")}{white("████")}{blue("██")}{white("███")}{blue("██")}{white("███")}{blue("███")}{white("████")}{blue("█")}{white("██")}{blue("██")}                   ║
-║{blue("█")}{white("████")}{blue("██")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█████")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█")}{blue("█")}{white("██")}    {gray("< Page 3/4 >")}   ║
-╚══════════════════════════════════════════════╝""", end="")
-    elif screen == 3:
-        print(f"""
-╔══════════════════════════════════════════════╗
-║{light_cyan("███████████████████████████")}      SETTINGS     ║
-║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}                   ║
-║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} FOCUS BLOCK: {f"{focusLength.minute}:{focusLength.second if len(str(focusLength.second)) == 2 else f"0{focusLength.second}"}"}║
-║{light_cyan("████████")}{white("████")}{light_cyan("██")}{white("████")}{light_cyan("█████████")} SHORT BREAK: {f"{shortBreakLenght.minute}:{shortBreakLenght.second if len(str(shortBreakLenght.second)) == 2 else f"0{shortBreakLenght.second}"}"} ║
-║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} LONG BREAK: {f"{longBreakLenght.minute}:{longBreakLenght.second if len(str(longBreakLenght.second)) == 2 else f"0{longBreakLenght.second}"}"} ║
-║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}SOUND ON DONE: {soundOnDone}║
-║{light_cyan("███████████████████████████")}                   ║
-║{light_cyan("███████████████████████████")}    {gray("< Page 4/4 >")}   ║
-╚══════════════════════════════════════════════╝""", end="")
+def keyread():
+    global screen, started, paused, elapsedSec
     k = readkey()
     if k == key.LEFT:
         if paused == True or started == None:
+            elapsedSec = 0
             screen -= 1
             if screen < 0:
                 screen = 3
     elif k == key.RIGHT:
         if paused == True or started == None:
+            elapsedSec = 0
             screen += 1
             if screen > 3:
                 screen = 0
@@ -132,7 +89,73 @@ while True:
         else:
             started = True
             paused = False
+    
+def ElapsedTime():
+    global elapsedSec
+    time.sleep(1)
+    elapsedSec += 1
 
+keyThread = threading.Thread(target=keyread)
+timeThread = threading.Thread(target=ElapsedTime)
+
+while True:
+    if screen == 0:
+        print(f"""
+╔══════════════════════════════════════════════╗
+║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}                   ║
+║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("██")}{red("█")}{white("██")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
+║{red("█")}{white("████")}{red("██")}{white("█")}{red("████")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}    FOCUS BLOCK    ║
+║{red("█")}{white("█")}{red("██████")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}       {f"{int(int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) // 60)}:{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60 if len(str(int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60)) == 2 else f"0{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60}"}"}       ║
+║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("████")}{red("███")}{white("████")}{red("█")}{red("█")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
+║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
+║{red("█")}{white("█")}{red("███")}{white("█")}{red("█")}{white("█")}{red("████")}{white("█")}{red("█")}{white("████")}{red("██")}{white("█")}{red("████")}{white("█")}{red("█")}                   ║
+║{red("█")}{white("████")}{red("███")}{white("████")}{red("██")}{white("█")}{red("███")}{white("█")}{red("██")}{white("████")}{red("█")}{red("█")}    {gray("< Page 1/4 >")}   ║
+╚══════════════════════════════════════════════╝""", end="")
+    elif screen == 1:
+        print(f"""
+╔══════════════════════════════════════════════╗
+║{light_blue("█")}{white("█████")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("███")}{light_blue("██")}{white("███")}{light_blue("██")}{white("████")}                   ║
+║{light_blue("█")}{white("█")}{light_blue("█████")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}                   ║
+║{light_blue("█")}{white("█████")}{light_blue("█")}{white("████")}{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("███")}{light_blue("███")}{white("██")}{light_blue("█")}    SHORT BREAK    ║
+║{light_blue("█████")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("██")}{white("██")}{light_blue("█")}       {f"{int(((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds()) // 60)}:{int(((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60) if len(str(int(((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60))) == 2 else f"0{int(((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60)}"}"}        ║
+║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("█████")}{light_blue("██")}{white("██")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
+║{light_blue("█")}{white("█")}{light_blue("███")}{white("█")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█████")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
+║{light_blue("█")}{white("████")}{light_blue("██")}{white("███")}{light_blue("██")}{white("███")}{light_blue("███")}{white("████")}{light_blue("█")}{white("██")}{light_blue("██")}                   ║
+║{light_blue("█")}{white("████")}{light_blue("██")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█████")}{light_blue("█")}{white("█")}{light_blue("██")}{white("█")}{light_blue("█")}{white("█")}{light_blue("█")}{white("██")}    {gray("< Page 2/4 >")}   ║
+╚══════════════════════════════════════════════╝""", end="")
+    elif screen == 2:
+        print(F"""
+╔══════════════════════════════════════════════╗
+║{blue("█")}{white("█")}{blue("███████")}{white("███")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("███")}{white("███")}{blue("██")}                   ║
+║{blue("█")}{white("█")}{blue("██████")}{white("█")}{blue("███")}{white("█")}{blue("██")}{white("██")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█████")}                   ║
+║{blue("█")}{white("█")}{blue("██████")}{white("█")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("██")}{blue("██")}{white("█")}{blue("██")}{white("███")}     LONG BREAK    ║
+║{blue("█")}{white("█████")}{blue("███")}{white("███")}{blue("███")}{white("█")}{blue("██")}{white("█")}{blue("███")}{white("███")}{blue("██")}       {f"{int(((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds()) // 60)}:{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60) if len(str(int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60))) == 2 else f"0{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60)}"}"}       ║
+║{blue("█")}{white("████")}{blue("██")}{white("███")}{blue("██")}{white("█████")}{blue("██")}{white("██")}{blue("██")}{white("█")}{blue("█")}{white("██")} {gray(f"{"(not started yet)" if started == None else "    (ongoing)    " if paused == False else "     (paused)    "}")} ║
+║{blue("█")}{white("█")}{blue("███")}{white("█")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█")}{blue("█████")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("██")}{blue("██")}                   ║
+║{blue("█")}{white("████")}{blue("██")}{white("███")}{blue("██")}{white("███")}{blue("███")}{white("████")}{blue("█")}{white("██")}{blue("██")}                   ║
+║{blue("█")}{white("████")}{blue("██")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█████")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█")}{blue("█")}{white("██")}    {gray("< Page 3/4 >")}   ║
+╚══════════════════════════════════════════════╝""", end="")
+    elif screen == 3:
+        print(f"""
+╔══════════════════════════════════════════════╗
+║{light_cyan("███████████████████████████")}      SETTINGS     ║
+║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}                   ║
+║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} FOCUS BLOCK: {f"{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds() // 60)}:{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60 if len(str(int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60)) == 2 else f"0{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60}"}"}║
+║{light_cyan("████████")}{white("████")}{light_cyan("██")}{white("████")}{light_cyan("█████████")} SHORT BREAK: {f"{int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() // 60)}:{int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60) if len(str(int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60))) == 2 else f"0{int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60)}"}"} ║
+║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} LONG BREAK: {f"{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() // 60)}:{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60) if len(str(int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60))) == 2 else f"0{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60)}"}"} ║
+║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}SOUND ON DONE: {soundOnDone}║
+║{light_cyan("███████████████████████████")}                   ║
+║{light_cyan("███████████████████████████")}    {gray("< Page 4/4 >")}   ║
+╚══════════════════════════════════════════════╝""", end="")
+    
+    while keyThread.is_alive() == True and timeThread.is_alive() == True:
+        pass
+    if keyThread.is_alive() == False:
+        keyThread = threading.Thread(target=keyread)
+        keyThread.start()
+    if timeThread.is_alive() == False and paused == False:
+        timeThread = threading.Thread(target=ElapsedTime)
+        timeThread.start()
 # Cool box divider: ╔════════╗
 #                   ║        ║ Source: https://gist.github.com/jamiew/40c66061b666272462c17f65addb14d5
 #                   ╚════════╝
