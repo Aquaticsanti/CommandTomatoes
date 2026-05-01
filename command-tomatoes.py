@@ -24,6 +24,10 @@ def gray(str: str) -> str:
     """Returns a given string in DARK GRAY color, using the colored module from termcolor"""
     return colored(str, "dark_grey")
 
+def light_cyan(str: str) -> str:
+    """Returns a given string in LIGHT CYAN color, using the colored module from termcolor"""
+    return colored(str, "light_cyan")
+
 hwnd = win32gui.GetForegroundWindow()
 win32gui.SetWindowPos(hwnd,win32con.HWND_TOPMOST,100,100,200,260,0)
 time.sleep(0.5)
@@ -88,16 +92,16 @@ while True:
 ║{blue("█")}{white("████")}{blue("██")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█████")}{blue("█")}{white("█")}{blue("██")}{white("█")}{blue("█")}{white("█")}{blue("█")}{white("██")}    {gray("< Page 3/4 >")}   ║
 ╚══════════════════════════════════════════════╝""", end="")
     elif screen == 3:
-        print("""
+        print(f"""
 ╔══════════════════════════════════════════════╗
-║                                              ║
-║                                              ║
-║    Uh oh, looks like this is not ready       ║
-║         yet! Please come back later          ║
-║                 (Page 4)                     ║
-║                                              ║
-║                                              ║
-║                                              ║
+║{light_cyan("███████████████████████████")}      SETTINGS     ║
+║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}                   ║
+║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} FOCUS BLOCK: {"MM:SS"}║
+║{light_cyan("████████")}{white("████")}{light_cyan("██")}{white("████")}{light_cyan("█████████")} SHORT BREAK: {"MM:SS"}║
+║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} LONG BREAK: {"MM:SS"} ║
+║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}SOUND ON DONE: {True}║
+║{light_cyan("███████████████████████████")}                   ║
+║{light_cyan("███████████████████████████")}    {gray("< Page 4/4 >")}   ║
 ╚══════════════════════════════════════════════╝""", end="")
     k = readkey()
     if k == key.LEFT:
