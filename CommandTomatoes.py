@@ -8,7 +8,7 @@ from termcolor import colored
 
 def red(str: str) -> str:
     """Returns a given string in RED color, using the colored module from termcolor"""
-    return colored(str, "red").strip()
+    return colored(str, "red")
 
 def white(str: str) -> str:
     """Returns a given string in WHITE color, using the colored module from termcolor"""
