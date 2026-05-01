@@ -108,8 +108,16 @@ def ElapsedTime():
     time.sleep(1)
     elapsedSec += 1
 
+def PreventNegativeTime():
+    global elapsedSec, started, paused
+    if (focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds() <= 0 or (shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() <= 0 or (longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() <= 0:
+        elapsedSec = 0
+        started = None
+        paused = None
+
 keyThread = threading.Thread(target=keyread)
 timeThread = threading.Thread(target=ElapsedTime)
+PreventNegativeTimeThread = threading.Thread(target=PreventNegativeTime)
 
 while True:
     if screen == 0:
@@ -161,7 +169,7 @@ while True:
 ║{light_cyan("███████████████████████████")}    {gray("< Page 4/4 >")}   ║
 ╚══════════════════════════════════════════════╝""", end="")
     
-    while keyThread.is_alive() == True and timeThread.is_alive() == True:
+    while keyThread.is_alive() == True and timeThread.is_alive() == True and PreventNegativeTimeThread.is_alive() == True:
         pass
     if keyThread.is_alive() == False:
         keyThread = threading.Thread(target=keyread)
@@ -169,6 +177,9 @@ while True:
     if timeThread.is_alive() == False and paused == False:
         timeThread = threading.Thread(target=ElapsedTime)
         timeThread.start()
+    if PreventNegativeTimeThread.is_alive() == False:
+        PreventNegativeTimeThread = threading.Thread(target=PreventNegativeTime)
+        PreventNegativeTimeThread.start()
 # Cool box divider: ╔════════╗
 #                   ║        ║ Source: https://gist.github.com/jamiew/40c66061b666272462c17f65addb14d5
 #                   ╚════════╝
