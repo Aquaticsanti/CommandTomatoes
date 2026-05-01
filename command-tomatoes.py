@@ -38,7 +38,6 @@ cols, rows = shutil.get_terminal_size()
 focusLength = datetime.timedelta(minutes=25, seconds=0)
 shortBreakLenght = datetime.timedelta(minutes=5, seconds=0)
 longBreakLenght = datetime.timedelta(minutes=15, seconds=0)
-soundOnDone = True
 elapsedSec = 0
 
 #print(f"columns: {cols} - rows: {rows}")
@@ -62,11 +61,12 @@ print("")
 # Screen two: Long break (default 15 mins)
 # Screen three: Settings
 screen = 0
+selectedSettings = 0
 started = None
 paused = None
 
 def keyread():
-    global screen, started, paused, elapsedSec
+    global screen, started, paused, elapsedSec, selectedSettings
     k = readkey()
     if k == key.LEFT:
         if paused == True or started == None:
@@ -140,10 +140,10 @@ while True:
 ╔══════════════════════════════════════════════╗
 ║{light_cyan("███████████████████████████")}      SETTINGS     ║
 ║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}                   ║
-║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} FOCUS BLOCK: {f"{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds() // 60)}:{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60 if len(str(int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60)) == 2 else f"0{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60}"}"}║
+║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} FOCUS BLOCK: {f"{f"{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds() // 60)}:{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60 if len(str(int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60)) == 2 else f"0{int((focusLength - datetime.timedelta(seconds=elapsedSec)).total_seconds()) % 60}"}"}"}║
 ║{light_cyan("████████")}{white("████")}{light_cyan("██")}{white("████")}{light_cyan("█████████")} SHORT BREAK: {f"{int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() // 60)}:{int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60) if len(str(int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60))) == 2 else f"0{int((shortBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60)}"}"} ║
 ║{light_cyan("██████████")}{white("██████")}{light_cyan("███████████")} LONG BREAK: {f"{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() // 60)}:{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60) if len(str(int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60))) == 2 else f"0{int((longBreakLenght - datetime.timedelta(seconds=elapsedSec)).total_seconds() % 60)}"}"} ║
-║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}SOUND ON DONE: {soundOnDone}║
+║{light_cyan("████████")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("██")}{white("██")}{light_cyan("█████████")}                   ║
 ║{light_cyan("███████████████████████████")}                   ║
 ║{light_cyan("███████████████████████████")}    {gray("< Page 4/4 >")}   ║
 ╚══════════════════════════════════════════════╝""", end="")
